@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>商設攝影棚｜器材租借系統</title>
+<title>攝影棚｜器材租借</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -251,7 +251,7 @@ tr:hover td{background:var(--primary-lt);}
 <body>
 
 <header>
-  <div class="logo">商設攝影棚 <span>/ EQUIPMENT RENTAL</span></div>
+  <div class="logo">攝影器材租借 <span>/ EQUIPMENT RENTAL</span></div>
   <nav id="mainNav">
     <button class="active" onclick="showPage('apply')" id="nav-apply">申請租借</button>
     <button onclick="showPage('query')" id="nav-query">查詢進度</button>
@@ -459,7 +459,7 @@ async function loadData(){
     showApiBanner();
     return;
   }
-  showLoading('從 Google Sheets 載入資料...');
+  showLoading('Sugar Sugar Rune Chocola Rune ✿');
   try{
     const [o,eq]=await Promise.all([apiGet('getOrders'),apiGet('getEq')]);
     if(o&&o.orders) state.orders=o.orders;
@@ -930,7 +930,7 @@ function applyTheme(theme,silent){
   document.querySelectorAll('.theme-dot').forEach(d=>{
     d.classList.toggle('active',d.dataset.theme===theme);
   });
-  if(!silent)showToast('主題已切換');
+
 }
 </script>
 
