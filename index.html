@@ -463,7 +463,15 @@ function showApiBanner(){
   banner.innerHTML='<strong>⚠ 本機模式：</strong>尚未設定 Google Sheets API，資料僅存在此瀏覽器。請依照說明書設定後填入 API_URL。';
   document.querySelector('.page.active')?.prepend(banner);
 }
-let selected=new Set(),activeFilter='全部',currentUser=null,adminTab='orders';
+let selected=new Set(),activeFilter='全部',adminTab='orders';
+// 從 localStorage 還原登入狀態
+let currentUser=(()=>{try{const u=localStorage.getItem('studio_user');return u?JSON.parse(u):null;}catch(e){return null;}})();
+if(currentUser){
+  document.addEventListener('DOMContentLoaded',()=>{
+    document.getElementById('userChip').style.display='flex';
+    document.getElementById('chipRole').textContent=currentUser.label;
+  });
+}
 
 function showPage(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -481,6 +489,7 @@ function doLogin(){
   if(!role)return showToast('請選擇角色',true);
   if(pw!==ROLES[role].pw)return showToast('密碼錯誤',true);
   currentUser={role,label:ROLES[role].label};
+  localStorage.setItem('studio_user',JSON.stringify(currentUser));
   document.getElementById('userChip').style.display='flex';
   document.getElementById('chipRole').textContent=currentUser.label;
   document.getElementById('loginPw').value='';
@@ -488,6 +497,7 @@ function doLogin(){
 }
 function logout(){
   currentUser=null;
+  localStorage.removeItem('studio_user');
   document.getElementById('userChip').style.display='none';
   showPage('apply');
 }
