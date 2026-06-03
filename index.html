@@ -244,6 +244,7 @@ tr:hover td{background:var(--blue-lt);}
   <div class="logo">商設攝影棚 <span>/ EQUIPMENT RENTAL</span></div>
   <nav id="mainNav">
     <button class="active" onclick="showPage('apply')" id="nav-apply">申請租借</button>
+    <button onclick="showPage('query')" id="nav-query">查詢進度</button>
     <button onclick="goAdmin()" id="nav-admin">後台管理</button>
   </nav>
   <div class="user-chip" id="userChip" style="display:none">
@@ -312,6 +313,21 @@ tr:hover td{background:var(--blue-lt);}
     <button class="btn-outline" onclick="showPage('apply')">取消</button>
     <button class="btn-blue" onclick="submitForm()">送出申請</button>
   </div>
+</div>
+
+<!-- ══ QUERY ══ -->
+<div class="page" id="page-query">
+  <div class="tab-label">My Applications</div>
+  <div class="page-heading">查詢<span>申請</span>進度</div>
+  <div class="form-card" style="max-width:480px">
+    <div class="section-label">輸入 Email 查詢</div>
+    <div class="fg" style="margin-bottom:16px">
+      <label>電子郵件</label>
+      <input id="q-email" type="email" placeholder="請輸入申請時填寫的 Email" onkeydown="if(event.key==='Enter')queryOrders()">
+    </div>
+    <button class="btn-blue" onclick="queryOrders()">查詢</button>
+  </div>
+  <div id="queryResults"></div>
 </div>
 
 <!-- ══ LOGIN ══ -->
@@ -477,10 +493,43 @@ function showPage(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
   document.getElementById('nav-apply').classList.toggle('active',id==='apply'||id==='form');
+  document.getElementById('nav-query').classList.toggle('active',id==='query');
   document.getElementById('nav-admin').classList.toggle('active',id==='admin'||id==='login');
   if(id==='apply')loadData().then(()=>renderGrid());
   if(id==='form')renderFormItems();
   if(id==='admin')renderAdmin();
+  if(id==='query'){loadData().then(()=>{document.getElementById('queryResults').innerHTML='';});}
+}
+function queryOrders(){
+  const email=document.getElementById('q-email').value.trim().toLowerCase();
+  if(!email)return showToast('請輸入 Email',true);
+  const results=state.orders.filter(o=>o.email&&o.email.toLowerCase()===email);
+  const c=document.getElementById('queryResults');
+  if(!results.length){c.innerHTML='<div class="form-card" style="max-width:480px;color:var(--muted);text-align:center;padding:36px">找不到此 Email 的申請記錄</div>';return;}
+  c.innerHTML=results.map(o=>{
+    const statusCls=o.finalStatus==='confirmed'?'b-confirmed':o.finalStatus==='rejected'?'b-rejected':'b-pending';
+    const statusTxt=o.finalStatus==='confirmed'?'已通過':o.finalStatus==='rejected'?'已拒絕':'審核中';
+    const fhtml=STEP_ORDER.map((s,i)=>{
+      const f=o.flow[s];
+      if(s==='finance'&&!o.needFinance)return`${i>0?'<span class="flow-arrow">→</span>':''}<span class="flow-step skip">${STEP_LABELS[s]}（略）</span>`;
+      let cls='',icon='○';
+      if(f.status==='approved'){cls='done';icon='✓';}
+      else if(f.status==='rejected'){cls='done';icon='✕';}
+      else if(o.currentStep===s){cls='active';icon='◎';}
+      return`${i>0?'<span class="flow-arrow">→</span>':''}<span class="flow-step ${cls}">${icon} ${STEP_LABELS[s]}</span>`;
+    }).join('');
+    return`<div class="form-card" style="max-width:680px;margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
+        <div>
+          <span style="font-family:Inter,sans-serif;font-size:11px;font-weight:900;color:var(--blue)">${o.id}</span>
+          <div style="font-size:15px;font-weight:700;margin-top:4px">${o.from} → ${o.to} <span style="color:var(--muted);font-size:12px">${o.period}</span></div>
+        </div>
+        <span class="badge ${statusCls}">${statusTxt}</span>
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:10px">器材：${o.items.map(i=>i.name).join('、')}</div>
+      <div class="flow-row">${fhtml}</div>
+    </div>`;
+  }).join('');
 }
 function goAdmin(){currentUser?showPage('admin'):showPage('login');}
 function doLogin(){
