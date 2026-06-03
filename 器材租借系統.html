@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>商設攝影棚｜器材租借系統</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --blue:#1565C0; --blue2:#1976D2; --blue-lt:#E3F2FD; --blue-mid:#90CAF9;
+  --cream:#F5F0E8; --cream2:#EDE8DE; --dark:#0D2137;
+  --white:#FFFFFF; --text:#0D2137; --muted:#5A7A9A;
+  --r:0px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--cream);color:var(--text);font-family:'Noto Sans TC','Inter',sans-serif;min-height:100vh;}
+
+/* ── HEADER ── */
+header{
+  background:var(--blue);color:#fff;
+  padding:0 36px;height:60px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;
+  clip-path:polygon(0 0,100% 0,100% 75%,97% 100%,0 100%);
+  padding-bottom:6px;
+}
+.logo{font-family:'Inter',sans-serif;font-weight:900;font-size:15px;letter-spacing:.08em;text-transform:uppercase;color:#fff;}
+.logo span{color:var(--blue-mid);font-weight:400;}
+nav{display:flex;gap:4px;}
+nav button{
+  background:none;border:none;color:rgba(255,255,255,.65);
+  font-family:'Noto Sans TC',sans-serif;font-size:12px;font-weight:700;
+  padding:6px 16px;cursor:pointer;transition:all .2s;
+  border-bottom:2px solid transparent; text-transform:uppercase; letter-spacing:.05em;
+}
+nav button.active,nav button:hover{color:#fff;border-bottom-color:#fff;}
+.user-chip{display:flex;align-items:center;gap:10px;font-size:12px;color:rgba(255,255,255,.8);}
+.user-chip strong{color:#fff;font-weight:900;}
+.user-chip button{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:4px 12px;font-size:11px;cursor:pointer;font-family:'Noto Sans TC',sans-serif;font-weight:700;}
+.user-chip button:hover{background:rgba(255,255,255,.25);}
+
+/* ── PAGES ── */
+.page{display:none;padding:36px 36px 60px;max-width:1160px;margin:0 auto;}
+.page.active{display:block;animation:fi .25s ease;}
+@keyframes fi{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+/* ── BLUE TAB LABEL ── */
+.tab-label{
+  display:inline-block;background:var(--blue);color:#fff;
+  font-family:'Inter',sans-serif;font-weight:900;font-size:10px;letter-spacing:.15em;text-transform:uppercase;
+  padding:5px 16px 5px 14px;margin-bottom:12px;
+  clip-path:polygon(0 0,100% 0,92% 100%,0 100%);
+}
+.page-heading{font-family:'Inter',sans-serif;font-weight:900;font-size:36px;line-height:1;color:var(--dark);margin-bottom:32px;}
+.page-heading span{color:var(--blue);}
+
+/* ── FILTER ── */
+.filter-bar{display:flex;gap:8px;margin-bottom:22px;flex-wrap:wrap;}
+.filter-btn{
+  background:var(--white);border:2px solid var(--cream2);color:var(--muted);
+  padding:6px 16px;font-size:12px;font-weight:700;cursor:pointer;
+  font-family:'Inter',sans-serif;letter-spacing:.05em;text-transform:uppercase;
+  transition:all .15s;
+}
+.filter-btn.active,.filter-btn:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-lt);}
+
+/* ── EQ GRID ── */
+.eq-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;margin-bottom:90px;}
+.eq-card{
+  background:var(--white);border:2px solid var(--cream2);
+  padding:18px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden;
+}
+.eq-card::before{
+  content:'';position:absolute;top:0;left:0;width:4px;height:100%;
+  background:var(--cream2);transition:background .15s;
+}
+.eq-card:hover{border-color:var(--blue-mid);transform:translateY(-2px);}
+.eq-card:hover::before{background:var(--blue-mid);}
+.eq-card.selected{border-color:var(--blue);background:var(--blue-lt);}
+.eq-card.selected::before{background:var(--blue);}
+.eq-card.unavailable{opacity:.4;cursor:not-allowed;}
+.cat-tag{font-size:9px;font-weight:900;letter-spacing:.18em;color:var(--muted);text-transform:uppercase;font-family:'Inter',sans-serif;margin-bottom:6px;}
+.eq-name{font-size:14px;font-weight:700;color:var(--dark);margin-bottom:3px;}
+.eq-spec{font-size:11px;color:var(--muted);margin-bottom:10px;min-height:14px;}
+.check-mark{
+  position:absolute;top:12px;right:12px;width:22px;height:22px;
+  background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:900;opacity:0;transition:opacity .15s;
+  clip-path:polygon(0 0,100% 0,100% 75%,75% 100%,0 100%);
+}
+.eq-card.selected .check-mark{opacity:1;}
+
+/* ── STATUS PILLS ── */
+.sdot{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:3px 9px;font-family:'Inter',sans-serif;}
+.s-ok{background:#E8F5E9;color:#1B5E20;}
+.s-out{background:#FFF3E0;color:#E65100;}
+.s-rep{background:#E3F2FD;color:#0D47A1;}
+.s-dmg{background:#FFEBEE;color:#B71C1C;}
+
+/* ── SEL BAR ── */
+.sel-bar{
+  position:fixed;bottom:0;left:0;right:0;
+  background:var(--blue);color:#fff;
+  padding:14px 36px;display:flex;align-items:center;justify-content:space-between;
+  transform:translateY(100%);transition:transform .3s;z-index:200;
+  clip-path:polygon(0 12px,24px 0,100% 0,100% 100%,0 100%);
+}
+.sel-bar.show{transform:none;}
+.sel-bar .info{font-size:14px;font-weight:700;} .sel-bar .info strong{font-size:20px;}
+.sel-bar-btns{display:flex;gap:10px;}
+.btn-wh{background:#fff;color:var(--blue);border:none;padding:10px 22px;font-size:13px;font-weight:900;cursor:pointer;font-family:'Noto Sans TC',sans-serif;letter-spacing:.03em;}
+.btn-wh:hover{background:var(--blue-lt);}
+.btn-ghost{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.4);padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
+.btn-ghost:hover{background:rgba(255,255,255,.25);}
+
+/* ── FORM ── */
+.form-card{background:var(--white);border:2px solid var(--cream2);padding:28px;margin-bottom:18px;position:relative;}
+.form-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--blue);}
+.section-label{
+  display:inline-block;background:var(--dark);color:#fff;
+  font-size:9px;font-weight:900;letter-spacing:.18em;text-transform:uppercase;font-family:'Inter',sans-serif;
+  padding:4px 14px 4px 12px;margin-bottom:18px;
+  clip-path:polygon(0 0,100% 0,94% 100%,0 100%);
+}
+.fg2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.fg{display:flex;flex-direction:column;gap:6px;}
+.fg.full{grid-column:span 2;}
+label{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;font-family:'Inter',sans-serif;}
+input,select,textarea{
+  background:var(--cream);border:2px solid var(--cream2);color:var(--dark);
+  padding:10px 13px;font-size:13px;font-family:'Noto Sans TC',sans-serif;
+  outline:none;transition:border-color .15s;width:100%;
+}
+input:focus,select:focus,textarea:focus{border-color:var(--blue);}
+select option{background:#fff;}
+textarea{resize:vertical;min-height:70px;}
+.sel-items{display:flex;flex-direction:column;gap:6px;}
+.sel-item{display:flex;align-items:center;justify-content:space-between;background:var(--cream);padding:9px 13px;}
+.sel-item span{font-size:13px;font-weight:700;} .sel-item .cat{font-size:10px;color:var(--muted);margin-left:8px;font-weight:400;}
+.sel-item button{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;font-weight:700;}
+.sel-item button:hover{color:#B71C1C;}
+.form-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;}
+.btn-blue{background:var(--blue);color:#fff;border:none;padding:11px 28px;font-size:13px;font-weight:900;cursor:pointer;font-family:'Noto Sans TC',sans-serif;letter-spacing:.03em;}
+.btn-blue:hover{background:var(--blue2);}
+.btn-outline{background:none;color:var(--muted);border:2px solid var(--cream2);padding:11px 20px;font-size:13px;cursor:pointer;font-family:'Noto Sans TC',sans-serif;font-weight:700;}
+.btn-outline:hover{border-color:var(--muted);}
+
+/* ── LOGIN ── */
+.login-wrap{min-height:calc(100vh - 60px);display:flex;align-items:center;justify-content:center;background:var(--cream);}
+.login-card{background:var(--white);border:2px solid var(--cream2);padding:48px 40px;width:400px;position:relative;}
+.login-card::after{content:'';position:absolute;top:0;left:0;right:0;height:5px;background:var(--blue);}
+.login-big{font-family:'Inter',sans-serif;font-weight:900;font-size:28px;color:var(--dark);line-height:1;margin-bottom:6px;}
+.login-big span{color:var(--blue);}
+.login-sub{font-size:13px;color:var(--muted);margin-bottom:28px;}
+.login-card select,.login-card input{background:var(--cream);margin-bottom:12px;}
+.login-card .btn-blue{width:100%;margin-top:4px;}
+.login-hint{margin-top:20px;font-size:11px;color:var(--muted);line-height:1.7;}
+.login-hint code{background:var(--cream2);padding:1px 6px;font-size:11px;}
+
+/* ── ADMIN ── */
+.admin-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:14px;}
+.stats-bar{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:28px;}
+.stat-card{background:var(--white);border:2px solid var(--cream2);padding:18px 16px;position:relative;overflow:hidden;}
+.stat-card::before{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--blue);}
+.stat-num{font-family:'Inter',sans-serif;font-weight:900;font-size:32px;color:var(--blue);line-height:1;}
+.stat-label{font-size:10px;font-weight:700;color:var(--muted);margin-top:5px;text-transform:uppercase;letter-spacing:.1em;font-family:'Inter',sans-serif;}
+
+/* ── TABS ── */
+.tab-bar{display:flex;gap:0;margin-bottom:22px;border-bottom:3px solid var(--blue);}
+.tab-btn{background:none;border:none;color:var(--muted);font-family:'Inter',sans-serif;font-size:11px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;padding:10px 20px;cursor:pointer;transition:all .15s;border-bottom:3px solid transparent;margin-bottom:-3px;}
+.tab-btn.active{color:var(--blue);background:var(--white);border-color:var(--blue);}
+.tab-btn:hover{color:var(--dark);}
+
+/* ── TABLE ── */
+.tbl-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+thead tr{background:var(--dark);}
+th{padding:11px 14px;text-align:left;font-size:9px;font-weight:900;letter-spacing:.14em;color:rgba(255,255,255,.7);text-transform:uppercase;font-family:'Inter',sans-serif;}
+td{padding:13px 14px;border-bottom:2px solid var(--cream);vertical-align:middle;}
+tr:hover td{background:var(--blue-lt);}
+.badge{display:inline-block;padding:3px 10px;font-size:10px;font-weight:900;font-family:'Inter',sans-serif;letter-spacing:.05em;}
+.b-pending{background:#FFF3E0;color:#E65100;}
+.b-supervisor{background:#E3F2FD;color:#0D47A1;}
+.b-admin{background:#E8F5E9;color:#1B5E20;}
+.b-approver{background:#F3E5F5;color:#4A148C;}
+.b-finance{background:#FFF3E0;color:#BF360C;}
+.b-confirmed{background:#E8F5E9;color:#1B5E20;}
+.b-rejected{background:#FFEBEE;color:#B71C1C;}
+.btn-sm{background:none;border:2px solid var(--cream2);color:var(--muted);padding:4px 10px;font-size:10px;font-weight:900;cursor:pointer;font-family:'Inter',sans-serif;margin-right:4px;transition:all .15s;letter-spacing:.04em;text-transform:uppercase;}
+.btn-sm:hover{border-color:var(--blue);color:var(--blue);}
+.btn-sm.gr:hover{border-color:#1B5E20;color:#1B5E20;}
+.btn-sm.rd:hover{border-color:#B71C1C;color:#B71C1C;}
+.btn-sm.pu:hover{border-color:#4A148C;color:#4A148C;}
+
+/* ── FLOW ── */
+.flow-row{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-top:6px;}
+.flow-step{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;padding:3px 9px;border:2px solid var(--cream2);font-family:'Inter',sans-serif;}
+.flow-step.done{border-color:#1B5E20;color:#1B5E20;background:#E8F5E9;}
+.flow-step.active{border-color:var(--blue);color:var(--blue);background:var(--blue-lt);}
+.flow-step.skip{border-color:var(--cream2);color:var(--muted);opacity:.5;}
+.flow-arrow{color:var(--muted);font-size:11px;}
+
+/* ── OVERLAY / MODAL ── */
+.overlay{position:fixed;inset:0;background:rgba(13,33,55,.75);z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s;}
+.overlay.show{opacity:1;pointer-events:all;}
+.modal{background:var(--white);border:2px solid var(--cream2);padding:30px;width:560px;max-width:92vw;max-height:82vh;overflow-y:auto;position:relative;}
+.modal::after{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:var(--blue);}
+.modal h3{font-family:'Inter',sans-serif;font-weight:900;font-size:18px;color:var(--dark);margin-bottom:18px;}
+.minfo{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.minfo-item label{font-size:10px;font-weight:900;color:var(--muted);display:block;margin-bottom:3px;text-transform:uppercase;letter-spacing:.08em;font-family:'Inter',sans-serif;}
+.minfo-item span{font-size:13px;font-weight:700;color:var(--dark);}
+.modal-acts{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;padding-top:14px;border-top:2px solid var(--cream2);}
+
+/* ── TOAST ── */
+.toast{position:fixed;top:72px;right:20px;background:var(--dark);color:#fff;padding:12px 20px;font-size:12px;font-weight:700;z-index:9999;opacity:0;transform:translateX(12px);transition:all .25s;pointer-events:none;font-family:'Inter',sans-serif;letter-spacing:.04em;}
+.toast.show{opacity:1;transform:none;}
+.toast.err{background:#B71C1C;}
+
+/* ── EMPTY ── */
+.empty{text-align:center;padding:56px;color:var(--muted);}
+.big-num{font-family:'Inter',sans-serif;font-weight:900;font-size:64px;color:var(--white);line-height:1;}
+
+@media(max-width:680px){
+  header{padding:0 16px;}
+  .page{padding:24px 16px;}
+  .fg2{grid-template-columns:1fr;}
+  .fg.full{grid-column:span 1;}
+  .stats-bar{grid-template-columns:1fr 1fr;}
+  .page-heading{font-size:26px;}
+}
+
+.loading-overlay{position:fixed;inset:0;background:rgba(13,33,55,.85);z-index:9000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
+.loading-overlay.hide{display:none;}
+.spinner{width:40px;height:40px;border:4px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-overlay p{color:#fff;font-family:Inter,sans-serif;font-weight:700;font-size:14px;letter-spacing:.05em;}
+.api-banner{background:var(--blue-lt);border:2px solid var(--blue-mid);padding:12px 20px;margin-bottom:20px;font-size:13px;color:var(--dark);}
+.api-banner strong{color:var(--blue);}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">商設攝影棚 <span>/ EQUIPMENT RENTAL</span></div>
+  <nav id="mainNav">
+    <button class="active" onclick="showPage('apply')" id="nav-apply">申請租借</button>
+    <button onclick="goAdmin()" id="nav-admin">後台管理</button>
+  </nav>
+  <div class="user-chip" id="userChip" style="display:none">
+    <span id="chipRole"></span>
+    <button onclick="logout()">登出</button>
+  </div>
+</header>
+
+<!-- ══ APPLY ══ -->
+<div class="page active" id="page-apply">
+  <div class="tab-label">Equipment Rental</div>
+  <div class="page-heading">選擇<span>租借</span>器材</div>
+  <div class="filter-bar" id="filterBar"></div>
+  <div class="eq-grid" id="eqGrid"></div>
+  <div class="sel-bar" id="selBar">
+    <div class="info">已選 <strong id="selCount">0</strong> 項器材</div>
+    <div class="sel-bar-btns">
+      <button class="btn-ghost" onclick="clearSel()">清除選擇</button>
+      <button class="btn-wh" onclick="showForm()">填寫申請 →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ FORM ══ -->
+<div class="page" id="page-form">
+  <div class="tab-label">Application Form</div>
+  <div class="page-heading">填寫<span>租借</span>申請</div>
+
+  <div class="form-card">
+    <div class="section-label">申請人資訊 Applicant</div>
+    <div class="fg2">
+      <div class="fg"><label>姓名 *</label><input id="f-name" type="text" placeholder="請輸入姓名"></div>
+      <div class="fg"><label>部門／單位 *</label><input id="f-dept" type="text" placeholder="所屬部門"></div>
+      <div class="fg"><label>聯絡電話 *</label><input id="f-phone" type="tel" placeholder="0912-345-678"></div>
+      <div class="fg"><label>電子郵件 *</label><input id="f-email" type="email" placeholder="email@example.com"></div>
+      <div class="fg"><label>直屬主管姓名 *</label><input id="f-supervisor" type="text" placeholder="Direct Supervisor"></div>
+      <div class="fg"><label>申請日期</label><input id="f-appdate" type="date"></div>
+    </div>
+  </div>
+
+  <div class="form-card">
+    <div class="section-label">租借時間 Rental Period</div>
+    <div class="fg2">
+      <div class="fg"><label>租借日期 *</label><input id="f-from" type="date"></div>
+      <div class="fg"><label>歸還日期 *</label><input id="f-to" type="date"></div>
+      <div class="fg"><label>時段 *</label>
+        <select id="f-period">
+          <option value="">請選擇時段</option>
+          <option>上午（09:00–13:00）</option>
+          <option>下午（13:00–18:00）</option>
+          <option>全天（09:00–18:00）</option>
+        </select>
+      </div>
+      <div class="fg"><label>使用地點</label><input id="f-venue" type="text" placeholder="拍攝地點"></div>
+      <div class="fg full"><label>用途說明</label><textarea id="f-purpose" placeholder="請簡述拍攝用途..."></textarea></div>
+    </div>
+  </div>
+
+  <div class="form-card">
+    <div class="section-label">器材清單 Equipment List</div>
+    <div class="sel-items" id="formItems"></div>
+    <div style="margin-top:14px"><button class="btn-outline" onclick="showPage('apply')">← 返回修改</button></div>
+  </div>
+
+  <div class="form-actions">
+    <button class="btn-outline" onclick="showPage('apply')">取消</button>
+    <button class="btn-blue" onclick="submitForm()">送出申請</button>
+  </div>
+</div>
+
+<!-- ══ LOGIN ══ -->
+<div class="page" id="page-login">
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="tab-label">Admin Access</div>
+      <div class="login-big">後台<span>管理</span>登入</div>
+      <div class="login-sub">請選擇角色並輸入對應密碼</div>
+      <select id="loginRole" style="width:100%">
+        <option value="">請選擇角色 —</option>
+        <option value="supervisor">直屬主管 Direct Supervisor</option>
+        <option value="equipment_admin">器材管理員 Equipment Admin</option>
+        <option value="approver">核准主管 Approving Manager</option>
+        <option value="finance">財務審核 Finance</option>
+        <option value="super">系統管理員 Super Admin</option>
+      </select>
+      <input id="loginPw" type="password" placeholder="密碼 Password" style="width:100%" onkeydown="if(event.key==='Enter')doLogin()">
+      <button class="btn-blue" onclick="doLogin()">登入 LOGIN</button>
+      <div class="login-hint">
+        預設密碼：<code>supervisor</code> / <code>admin</code> / <code>approver</code> / <code>finance</code> / <code>super1234</code>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ADMIN ══ -->
+<div class="page" id="page-admin">
+  <div class="admin-top">
+    <div>
+      <div class="tab-label" id="adminRoleLabel">Admin</div>
+      <div class="page-heading" style="margin-bottom:0">後台<span>管理</span></div>
+    </div>
+    <button class="btn-outline" onclick="logout()" style="align-self:flex-end">登出</button>
+  </div>
+  <div class="stats-bar" id="statsBar"></div>
+  <div class="tab-bar" id="adminTabs"></div>
+  <div id="adminContent"></div>
+</div>
+
+<!-- Modal -->
+<div class="overlay" id="overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <h3 id="mTitle"></h3>
+    <div class="minfo" id="mInfo"></div>
+    <div id="mItems"></div>
+    <div id="mFlow"></div>
+    <div id="mNote" style="margin-top:14px;display:none">
+      <label style="font-size:11px;font-weight:900;color:var(--muted);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em;font-family:Inter,sans-serif">備註 / 拒絕原因</label>
+      <textarea id="mNoteInput" style="width:100%" placeholder="可輸入備註或拒絕原因..."></textarea>
+    </div>
+    <div class="modal-acts" id="mActs"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const ROLES={
+  supervisor:     {label:'直屬主管',      pw:'supervisor'},
+  equipment_admin:{label:'器材管理員',    pw:'admin'},
+  approver:       {label:'核准主管',      pw:'approver'},
+  finance:        {label:'財務審核',      pw:'finance'},
+  super:          {label:'系統管理員',    pw:'super1234'},
+};
+const EQUIPMENT=[
+  {id:1,  cat:'相機',   name:'Sony a7RIII（#1）',      spec:''},
+  {id:2,  cat:'相機',   name:'Sony a7IV（#2）',         spec:''},
+  {id:3,  cat:'鏡頭',   name:'Sigma 28-70mm',           spec:'鏡頭蓋×1、遮光罩×1'},
+  {id:4,  cat:'鏡頭',   name:'GM 24-70mm',              spec:'鏡頭蓋×1、遮光罩×1'},
+  {id:5,  cat:'鏡頭',   name:'GM 50mm',                 spec:'鏡頭蓋×1'},
+  {id:6,  cat:'電池',   name:'Sony 相機電池',            spec:'共兩顆'},
+  {id:7,  cat:'充電',   name:'相機電池充電座',           spec:'含線'},
+  {id:8,  cat:'閃光燈', name:'Canon 閃光燈',             spec:'含袋子'},
+  {id:9,  cat:'棚燈',   name:'LITEMONS LA150D',         spec:'攝影棚燈，含線'},
+  {id:10, cat:'棚燈',   name:'LITEMONS LA200Bi',        spec:'攝影棚燈，含線共兩個'},
+  {id:11, cat:'燈罩',   name:'GODOX CS-85T',            spec:'小籠包燈罩'},
+  {id:12, cat:'燈罩',   name:'GODOX QR-P60T',           spec:'燈罩'},
+  {id:13, cat:'腳架',   name:'Manfrotto 190',           spec:'相機腳架'},
+  {id:14, cat:'觸發器', name:'閃光燈觸發器',             spec:''},
+  {id:15, cat:'燈箱',   name:'DEEP 攝影燈箱',           spec:'含線'},
+  {id:16, cat:'相機包', name:'JENOVA 相機包',            spec:'外出用'},
+  {id:17, cat:'相機包', name:'Tamrac 相機包',            spec:'外出用'},
+  {id:18, cat:'道具',   name:'窗簾支架（黑）',           spec:'拍攝用一組'},
+  {id:19, cat:'道具',   name:'鋁梯',                    spec:''},
+  {id:20, cat:'道具',   name:'木板凳',                  spec:''},
+  {id:21, cat:'器材',   name:'DJI RS4 Mini 穩定器',     spec:'含配件'},
+  {id:22, cat:'記憶卡', name:'相機記憶卡（SD）',         spec:'共三張'},
+];
+const STEP_ORDER=['supervisor','equipment_admin','approver','finance'];
+const STEP_LABELS={supervisor:'直屬主管',equipment_admin:'器材管理員',approver:'核准主管',finance:'財務審核'};
+// ── Google Sheets API 設定 ────────────────────────────
+const API_URL = 'https://script.google.com/macros/s/AKfycbwbnhrc58dk7bH7sAIAbUYFgX_9cW6x_pIFMkWaiEZfLSXS59Q4ViUt0yC-Pm6iQwpx/exec'; // ← 部署後把網址貼在這裡
+
+const SK='studio_v3_cache';
+let state={orders:[],eqStatus:EQUIPMENT.map(e=>({...e,status:'正常 / 可借出'}))};
+
+function showLoading(msg='資料處理中...'){
+  document.getElementById('loadingOverlay').classList.remove('hide');
+  document.getElementById('loadingMsg').textContent=msg;
+}
+function hideLoading(){document.getElementById('loadingOverlay').classList.add('hide');}
+
+async function apiGet(action){
+  if(!API_URL) return null;
+  const r=await fetch(API_URL+'?action='+action);
+  return r.json();
+}
+async function apiPost(body){
+  if(!API_URL) return null;
+  const r=await fetch(API_URL,{method:'POST',body:JSON.stringify(body)});
+  return r.json();
+}
+
+async function loadData(){
+  if(!API_URL){
+    // 未設定 API → 用 localStorage（本機模式）
+    try{const d=localStorage.getItem(SK);if(d){const p=JSON.parse(d);state.orders=p.orders||[];state.eqStatus=p.eqStatus||state.eqStatus;}}catch(e){}
+    showApiBanner();
+    return;
+  }
+  showLoading('從 Google Sheets 載入資料...');
+  try{
+    const [o,eq]=await Promise.all([apiGet('getOrders'),apiGet('getEq')]);
+    if(o&&o.orders) state.orders=o.orders;
+    if(eq&&eq.eqStatus&&eq.eqStatus.length) state.eqStatus=eq.eqStatus;
+  }catch(e){showToast('無法連線 Google Sheets，使用本機暫存',true);}
+  hideLoading();
+}
+
+function save(){
+  // 永遠同步到 localStorage 做備份
+  try{localStorage.setItem(SK,JSON.stringify({orders:state.orders,eqStatus:state.eqStatus}));}catch(e){}
+}
+async function saveOrders(){
+  save();
+}
+async function syncEqToSheets(){
+  if(!API_URL)return;
+  await apiPost({action:'saveEq',eqList:state.eqStatus});
+}
+
+function showApiBanner(){
+  const existing=document.getElementById('apiBanner');
+  if(existing||API_URL)return;
+  const banner=document.createElement('div');
+  banner.id='apiBanner';
+  banner.className='api-banner';
+  banner.innerHTML='<strong>⚠ 本機模式：</strong>尚未設定 Google Sheets API，資料僅存在此瀏覽器。請依照說明書設定後填入 API_URL。';
+  document.querySelector('.page.active')?.prepend(banner);
+}
+let selected=new Set(),activeFilter='全部',currentUser=null,adminTab='orders';
+
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.getElementById('nav-apply').classList.toggle('active',id==='apply'||id==='form');
+  document.getElementById('nav-admin').classList.toggle('active',id==='admin'||id==='login');
+  if(id==='apply')loadData().then(()=>renderGrid());
+  if(id==='form')renderFormItems();
+  if(id==='admin')renderAdmin();
+}
+function goAdmin(){currentUser?showPage('admin'):showPage('login');}
+function doLogin(){
+  const role=document.getElementById('loginRole').value;
+  const pw=document.getElementById('loginPw').value;
+  if(!role)return showToast('請選擇角色',true);
+  if(pw!==ROLES[role].pw)return showToast('密碼錯誤',true);
+  currentUser={role,label:ROLES[role].label};
+  document.getElementById('userChip').style.display='flex';
+  document.getElementById('chipRole').textContent=currentUser.label;
+  document.getElementById('loginPw').value='';
+  showPage('admin');
+}
+function logout(){
+  currentUser=null;
+  document.getElementById('userChip').style.display='none';
+  showPage('apply');
+}
+
+// GRID
+function eqSt(id){const s=state.eqStatus.find(e=>e.id===id);return s?s.status:'正常 / 可借出';}
+function isAvail(id){return eqSt(id)==='正常 / 可借出';}
+function cats(){return['全部',...new Set(EQUIPMENT.map(e=>e.cat))];}
+function renderGrid(){
+  document.getElementById('filterBar').innerHTML=cats().map(c=>
+    `<button class="filter-btn ${c===activeFilter?'active':''}" onclick="setFilter('${c}')">${c}</button>`).join('');
+  const list=activeFilter==='全部'?EQUIPMENT:EQUIPMENT.filter(e=>e.cat===activeFilter);
+  document.getElementById('eqGrid').innerHTML=list.map(eq=>{
+    const av=isAvail(eq.id),sel=selected.has(eq.id),st=eqSt(eq.id);
+    const cls=st==='借出中'?'s-out':st==='維修中'?'s-rep':(st==='損壞'||st==='遺失')?'s-dmg':'s-ok';
+    return `<div class="eq-card ${sel?'selected':''} ${!av?'unavailable':''}" onclick="${av?`tog(${eq.id})`:''}">
+      <div class="check-mark">✓</div>
+      <div class="cat-tag">${eq.cat}</div>
+      <div class="eq-name">${eq.name}</div>
+      <div class="eq-spec">${eq.spec||'　'}</div>
+      <span class="sdot ${cls}">● ${st}</span>
+    </div>`;
+  }).join('');
+  document.getElementById('selCount').textContent=selected.size;
+  document.getElementById('selBar').classList.toggle('show',selected.size>0);
+}
+function setFilter(c){activeFilter=c;renderGrid();}
+function tog(id){selected.has(id)?selected.delete(id):selected.add(id);renderGrid();}
+function clearSel(){selected.clear();renderGrid();}
+
+// FORM
+function showForm(){if(!selected.size)return showToast('請先選擇器材',true);document.getElementById('f-appdate').value=new Date().toISOString().slice(0,10);showPage('form');}
+function renderFormItems(){
+  const items=EQUIPMENT.filter(e=>selected.has(e.id));
+  document.getElementById('formItems').innerHTML=items.map(e=>
+    `<div class="sel-item"><div><span>${e.name}</span><span class="cat">${e.cat}</span></div><button onclick="removeItem(${e.id})">✕</button></div>`
+  ).join('')||'<div style="color:var(--muted);font-size:13px">尚未選擇任何器材</div>';
+}
+function removeItem(id){selected.delete(id);renderFormItems();if(!selected.size){showPage('apply');showToast('已清空，請重新選取');}}
+function submitForm(){
+  const v=['f-name','f-dept','f-phone','f-email','f-supervisor','f-from','f-to','f-period'].map(id=>document.getElementById(id).value.trim());
+  if(v.some(x=>!x))return showToast('請填寫所有必填欄位',true);
+  if(!selected.size)return showToast('請選擇至少一項器材',true);
+  const [name,dept,phone,email,supervisor,from,to,period]=v;
+  const order={
+    id:'R'+Date.now().toString().slice(-6),
+    name,dept,phone,email,supervisor,
+    appdate:document.getElementById('f-appdate').value,
+    from,to,period,
+    venue:document.getElementById('f-venue').value,
+    purpose:document.getElementById('f-purpose').value,
+    items:[...selected].map(id=>EQUIPMENT.find(e=>e.id===id)),
+    flow:{
+      supervisor:      {status:'pending', by:'',at:'',note:''},
+      equipment_admin: {status:'waiting', by:'',at:'',note:''},
+      approver:        {status:'waiting', by:'',at:'',note:''},
+      finance:         {status:'skip',   by:'',at:'',note:''},
+    },
+    needFinance:false,currentStep:'supervisor',finalStatus:'pending',
+    createdAt:new Date().toISOString(),
+  };
+  state.orders.unshift(order);save();
+  ['f-name','f-dept','f-phone','f-email','f-supervisor','f-from','f-to','f-venue','f-purpose'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-period').value='';selected.clear();
+  showToast('申請已送出！編號：'+order.id);
+  if(API_URL){showLoading('上傳到 Google Sheets...');apiPost({action:'saveOrder',order}).then(()=>hideLoading()).catch(()=>{hideLoading();showToast('Sheets 寫入失敗，已存本機',true);});}
+  setTimeout(()=>showPage('apply'),1400);
+}
+
+// ADMIN
+const ROLE_TABS={super:['orders','eqstatus'],supervisor:['orders'],equipment_admin:['orders','eqstatus'],approver:['orders'],finance:['orders']};
+const TAB_LABELS={orders:'租借申請',eqstatus:'器材狀態'};
+function renderAdmin(){
+  if(!currentUser)return;
+  document.getElementById('adminRoleLabel').textContent=currentUser.label;
+  renderStats();
+  const tabs=ROLE_TABS[currentUser.role]||['orders'];
+  if(!tabs.includes(adminTab))adminTab=tabs[0];
+  document.getElementById('adminTabs').innerHTML=tabs.map(t=>
+    `<button class="tab-btn ${t===adminTab?'active':''}" onclick="switchTab('${t}')">${TAB_LABELS[t]}</button>`).join('');
+  renderTabContent();
+}
+function switchTab(t){adminTab=t;renderAdmin();}
+function renderStats(){
+  const o=state.orders,role=currentUser.role;
+  const myP=o.filter(ord=>ord.finalStatus==='pending'&&(role==='super'||ord.currentStep===role)).length;
+  document.getElementById('statsBar').innerHTML=[
+    {num:o.length,         label:'Total',   color:''},
+    {num:myP,              label:'待我審核', color:'#1565C0'},
+    {num:o.filter(x=>x.finalStatus==='pending').length, label:'進行中', color:'#0D47A1'},
+    {num:o.filter(x=>x.finalStatus==='confirmed').length,label:'已通過', color:'#1B5E20'},
+    {num:o.filter(x=>x.finalStatus==='rejected').length, label:'已拒絕', color:'#B71C1C'},
+  ].map((s,i)=>`<div class="stat-card"><div class="stat-num" style="${s.color?`color:${s.color}`:''}"> ${s.num}</div><div class="stat-label">${s.label}</div></div>`).join('');
+}
+function renderTabContent(){
+  const c=document.getElementById('adminContent');
+  if(adminTab==='orders')c.innerHTML=buildOrdersHTML();
+  else c.innerHTML=buildEqHTML();
+}
+function buildOrdersHTML(){
+  if(!state.orders.length)return`<div class="empty"><div class="big-num">0</div><div style="font-weight:700;color:var(--muted)">尚無申請記錄</div></div>`;
+  const role=currentUser.role;
+  return`<div class="tbl-wrap"><table>
+    <thead><tr><th>編號</th><th>申請人</th><th>租借時間</th><th>器材</th><th>審核進度</th><th>操作</th></tr></thead>
+    <tbody>${state.orders.map(o=>{
+      const canAct=o.finalStatus==='pending'&&(role==='super'||o.currentStep===role);
+      return`<tr>
+        <td><span style="font-family:Inter,sans-serif;font-size:11px;font-weight:900;color:var(--blue)">${o.id}</span></td>
+        <td><span style="font-weight:700">${o.name}</span><br><span style="font-size:11px;color:var(--muted)">${o.dept}</span></td>
+        <td style="font-size:12px">${o.from} → ${o.to}<br><span style="color:var(--muted)">${o.period}</span></td>
+        <td>${o.items.map(i=>`<div style="font-size:12px;font-weight:700">${i.name}</div>`).join('')}</td>
+        <td>${getStepBadge(o)}</td>
+        <td>
+          <button class="btn-sm" onclick="viewOrder('${o.id}')">詳情</button>
+          ${canAct?`<button class="btn-sm gr" onclick="approveStep('${o.id}')">通過</button><button class="btn-sm rd" onclick="openReject('${o.id}')">拒絕</button>`:''}
+          ${canAct&&role==='equipment_admin'&&!o.needFinance?`<button class="btn-sm pu" onclick="addFinance('${o.id}')">+財務</button>`:''}
+          ${canAct&&role==='super'&&!o.needFinance?`<button class="btn-sm pu" onclick="addFinance('${o.id}')">+財務</button>`:''}
+          ${role==='super'&&o.needFinance&&o.finalStatus==='pending'?`<button class="btn-sm" onclick="removeFinance('${o.id}')">取消財務</button>`:''}
+          ${role==='super'?`<button class="btn-sm" onclick="openEditOrder('${o.id}')">編輯</button><button class="btn-sm rd" onclick="deleteOrder('${o.id}')">刪除</button>`:''}
+        </td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table></div>`;
+}
+function getStepBadge(o){
+  if(o.finalStatus==='confirmed')return`<span class="badge b-confirmed">✓ 已通過</span>`;
+  if(o.finalStatus==='rejected') return`<span class="badge b-rejected">✕ 已拒絕</span>`;
+  const m={supervisor:'b-supervisor',equipment_admin:'b-admin',approver:'b-approver',finance:'b-finance'};
+  const l={supervisor:'待主管審核',equipment_admin:'待管理員確認',approver:'待核准主管',finance:'待財務審核'};
+  return`<span class="badge ${m[o.currentStep]||'b-pending'}">${l[o.currentStep]||o.currentStep}</span>`;
+}
+function buildEqHTML(){
+  const isSuper=currentUser.role==='super';
+  const opts=['正常 / 可借出','借出中','維修中','損壞','遺失'];
+  const addBtn=isSuper?`<div style="margin-bottom:16px;text-align:right"><button class="btn-blue" onclick="openEqModal(null)" style="padding:8px 20px;font-size:12px">＋ 新增器材</button></div>`:'';
+  return addBtn+`<div class="tbl-wrap"><table>
+    <thead><tr><th>#</th><th>類別</th><th>器材名稱</th><th>型號／備註</th><th>數量</th><th>狀態</th><th>更新狀態</th>${isSuper?'<th>編輯</th>':''}</tr></thead>
+    <tbody>${state.eqStatus.map(eq=>{
+      const cls=eq.status==='正常 / 可借出'?'s-ok':eq.status==='借出中'?'s-out':eq.status==='維修中'?'s-rep':'s-dmg';
+      return`<tr>
+        <td style="font-family:Inter,sans-serif;font-size:11px;font-weight:900;color:var(--muted)">${eq.id}</td>
+        <td style="font-size:12px">${eq.cat}</td>
+        <td style="font-weight:700">${eq.name}</td>
+        <td style="font-size:12px;color:var(--muted)">${eq.spec||'—'}</td>
+        <td style="text-align:center;font-weight:900">${eq.qty}</td>
+        <td><span class="sdot ${cls}">● ${eq.status}</span></td>
+        <td><select onchange="setEqStatus(${eq.id},this.value)" style="font-size:11px;padding:5px 8px;font-weight:700">
+          ${opts.map(s=>`<option ${s===eq.status?'selected':''}>${s}</option>`).join('')}
+        </select></td>
+        ${isSuper?`<td>
+          <button class="btn-sm" onclick="openEqModal(${eq.id})">編輯</button>
+          <button class="btn-sm rd" onclick="deleteEq(${eq.id})">刪除</button>
+        </td>`:''}
+      </tr>`;
+    }).join('')}</tbody>
+  </table></div>`;
+}
+function setEqStatus(id,status){const eq=state.eqStatus.find(e=>e.id===id);if(eq){eq.status=status;save();if(API_URL)apiPost({action:'saveEq',eqList:state.eqStatus}).catch(()=>{});showToast('器材狀態已更新');}}
+
+function removeFinance(id){
+  const o=state.orders.find(x=>x.id===id);if(!o)return;
+  o.needFinance=false;
+  o.flow.finance={status:'skip',by:'',at:'',note:''};
+  // 如果當前步驟就是 finance，退回 approver
+  if(o.currentStep==='finance'){o.currentStep='approver';o.flow.approver.status='pending';}
+  save();
+  if(API_URL)apiPost({action:'updateOrder',order:o}).catch(()=>{});
+  renderAdmin();showToast('已取消財務審核關卡');
+}
+function deleteOrder(id){
+  if(!confirm('確定要刪除申請 '+id+' 嗎？此動作無法復原。'))return;
+  state.orders=state.orders.filter(x=>x.id!==id);
+  save();
+  if(API_URL)apiPost({action:'deleteOrder',id}).catch(()=>{});
+  renderAdmin();showToast('申請已刪除');
+}
+function openEditOrder(id){
+  const o=state.orders.find(x=>x.id===id);if(!o)return;
+  document.getElementById('mTitle').textContent='編輯申請 — '+o.id;
+  document.getElementById('mInfo').innerHTML='';
+  document.getElementById('mFlow').innerHTML='';
+  document.getElementById('mNote').style.display='none';
+  document.getElementById('mItems').innerHTML=`
+    <div class="fg2" style="gap:14px;margin-bottom:14px">
+      <div class="fg"><label>姓名</label><input id="eo-name" value="${o.name}"></div>
+      <div class="fg"><label>部門</label><input id="eo-dept" value="${o.dept}"></div>
+      <div class="fg"><label>電話</label><input id="eo-phone" value="${o.phone}"></div>
+      <div class="fg"><label>Email</label><input id="eo-email" value="${o.email}"></div>
+      <div class="fg"><label>直屬主管</label><input id="eo-supervisor" value="${o.supervisor}"></div>
+      <div class="fg"><label>租借日期</label><input id="eo-from" type="date" value="${o.from}"></div>
+      <div class="fg"><label>歸還日期</label><input id="eo-to" type="date" value="${o.to}"></div>
+      <div class="fg"><label>時段</label>
+        <select id="eo-period">
+          <option ${o.period==='上午（09:00–13:00）'?'selected':''}>上午（09:00–13:00）</option>
+          <option ${o.period==='下午（13:00–18:00）'?'selected':''}>下午（13:00–18:00）</option>
+          <option ${o.period==='全天（09:00–18:00）'?'selected':''}>全天（09:00–18:00）</option>
+        </select>
+      </div>
+      <div class="fg"><label>地點</label><input id="eo-venue" value="${o.venue||''}"></div>
+      <div class="fg full"><label>用途</label><textarea id="eo-purpose">${o.purpose||''}</textarea></div>
+    </div>
+    <div style="font-size:10px;font-weight:900;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;font-family:Inter,sans-serif;margin-bottom:8px">器材清單（暫不可修改）</div>
+    ${o.items.map(i=>`<div class="sel-item" style="margin-bottom:5px"><span>${i.name}</span><span class="cat">${i.cat}</span></div>`).join('')}`;
+  document.getElementById('mActs').innerHTML=
+    `<button class="btn-outline" onclick="closeModal()">取消</button>
+     <button class="btn-blue" onclick="saveEditOrder('${id}')">儲存變更</button>`;
+  document.getElementById('overlay').classList.add('show');
+}
+function saveEditOrder(id){
+  const o=state.orders.find(x=>x.id===id);if(!o)return;
+  o.name=document.getElementById('eo-name').value.trim()||o.name;
+  o.dept=document.getElementById('eo-dept').value.trim()||o.dept;
+  o.phone=document.getElementById('eo-phone').value.trim()||o.phone;
+  o.email=document.getElementById('eo-email').value.trim()||o.email;
+  o.supervisor=document.getElementById('eo-supervisor').value.trim()||o.supervisor;
+  o.from=document.getElementById('eo-from').value||o.from;
+  o.to=document.getElementById('eo-to').value||o.to;
+  o.period=document.getElementById('eo-period').value||o.period;
+  o.venue=document.getElementById('eo-venue').value;
+  o.purpose=document.getElementById('eo-purpose').value;
+  save();
+  if(API_URL)apiPost({action:'updateOrder',order:o}).catch(()=>{});
+  closeModal();renderAdmin();showToast('申請已更新');
+}
+function openEqModal(id){
+  const eq=id!=null?state.eqStatus.find(e=>e.id===id):null;
+  document.getElementById('mTitle').textContent=eq?'編輯器材':'新增器材';
+  document.getElementById('mInfo').innerHTML='';
+  document.getElementById('mFlow').innerHTML='';
+  document.getElementById('mNote').style.display='none';
+  document.getElementById('mItems').innerHTML=`
+    <div class="fg2" style="gap:14px">
+      <div class="fg"><label>類別 *</label><input id="eq-cat" value="${eq?eq.cat:''}" placeholder="例：相機、鏡頭"></div>
+      <div class="fg"><label>器材名稱 *</label><input id="eq-name" value="${eq?eq.name:''}" placeholder="器材全名"></div>
+      <div class="fg"><label>型號／備註</label><input id="eq-spec" value="${eq?eq.spec:''}" placeholder="規格或備註"></div>
+      <div class="fg"><label>數量 *</label><input id="eq-qty" type="number" min="1" value="${eq?eq.qty:1}"></div>
+    </div>`;
+  document.getElementById('mActs').innerHTML=
+    `<button class="btn-outline" onclick="closeModal()">取消</button>
+     <button class="btn-blue" onclick="saveEq(${id!=null?id:'null'})">${eq?'儲存變更':'新增器材'}</button>`;
+  document.getElementById('overlay').classList.add('show');
+}
+function saveEq(id){
+  const cat=document.getElementById('eq-cat').value.trim();
+  const name=document.getElementById('eq-name').value.trim();
+  const spec=document.getElementById('eq-spec').value.trim();
+  const qty=parseInt(document.getElementById('eq-qty').value)||1;
+  if(!cat||!name)return showToast('類別和名稱為必填',true);
+  if(id!==null&&id!==undefined&&id!=='null'){
+    const eq=state.eqStatus.find(e=>e.id===id);
+    if(eq){eq.cat=cat;eq.name=name;eq.spec=spec;eq.qty=qty;}
+  } else {
+    const newId=Math.max(0,...state.eqStatus.map(e=>e.id))+1;
+    state.eqStatus.push({id:newId,cat,name,spec,qty,status:'正常 / 可借出'});
+  }
+  save();
+  if(API_URL)apiPost({action:'saveEq',eqList:state.eqStatus}).catch(()=>{});
+  closeModal();renderAdmin();showToast(id&&id!=='null'?'器材已更新':'器材已新增');
+}
+function deleteEq(id){
+  if(!confirm('確定要刪除這項器材嗎？'))return;
+  state.eqStatus=state.eqStatus.filter(e=>e.id!==id);
+  save();
+  if(API_URL)apiPost({action:'saveEq',eqList:state.eqStatus}).catch(()=>{});
+  renderAdmin();showToast('器材已刪除');
+}
+
+// FLOW
+function nextStep(o){
+  const idx=STEP_ORDER.indexOf(o.currentStep);
+  for(let i=idx+1;i<STEP_ORDER.length;i++){
+    const s=STEP_ORDER[i];
+    if(s==='finance'&&!o.needFinance)continue;
+    return s;
+  }
+  return null;
+}
+function approveStep(id){
+  const o=state.orders.find(x=>x.id===id);if(!o)return;
+  const step=o.currentStep;
+  o.flow[step]={status:'approved',by:currentUser.label,at:new Date().toISOString(),note:''};
+  const nxt=nextStep(o);
+  if(nxt){o.currentStep=nxt;o.flow[nxt].status='pending';}
+  else{o.finalStatus='confirmed';o.currentStep='done';}
+  save();
+  if(API_URL)apiPost({action:'updateOrder',order:o}).catch(()=>{});
+  closeModal();renderAdmin();showToast('✓ 已通過 '+id);
+}
+function openReject(id){
+  document.getElementById('mTitle').textContent='拒絕申請';
+  document.getElementById('mInfo').innerHTML=`<div class="minfo-item" style="grid-column:span 2"><label>申請編號</label><span>${id}</span></div>`;
+  document.getElementById('mItems').innerHTML='<p style="font-size:13px;color:var(--muted);margin-bottom:12px">請填寫拒絕原因（選填）</p>';
+  document.getElementById('mFlow').innerHTML='';
+  document.getElementById('mNote').style.display='block';
+  document.getElementById('mNoteInput').value='';
+  document.getElementById('mActs').innerHTML=
+    `<button class="btn-outline" onclick="closeModal()">取消</button>
+     <button class="btn-blue" onclick="confirmReject('${id}')">確認拒絕</button>`;
+  document.getElementById('overlay').classList.add('show');
+}
+function confirmReject(id){
+  const o=state.orders.find(x=>x.id===id);if(!o)return;
+  const note=document.getElementById('mNoteInput').value;
+  o.flow[o.currentStep]={status:'rejected',by:currentUser?.label||'',at:new Date().toISOString(),note};
+  o.finalStatus='rejected';
+  save();
+  if(API_URL)apiPost({action:'updateOrder',order:o}).catch(()=>{});
+  closeModal();renderAdmin();showToast('已拒絕 '+id);
+}
+function addFinance(id){
+  const o=state.orders.find(x=>x.id===id);if(!o)return;
+  o.needFinance=true;o.flow.finance.status='waiting';
+  save();renderAdmin();showToast('已加入財務審核關卡');
+}
+function viewOrder(id){
+  const o=state.orders.find(x=>x.id===id);if(!o)return;
+  document.getElementById('mTitle').textContent='申請詳情 — '+o.id;
+  document.getElementById('mInfo').innerHTML=[
+    {l:'申請人',v:o.name},{l:'部門',v:o.dept},{l:'電話',v:o.phone},{l:'Email',v:o.email},
+    {l:'直屬主管',v:o.supervisor},{l:'申請日期',v:o.appdate||'—'},
+    {l:'租借日期',v:o.from},{l:'歸還日期',v:o.to},
+    {l:'時段',v:o.period},{l:'地點',v:o.venue||'—'},
+    {l:'用途',v:o.purpose||'—'},{l:'狀態',v:o.finalStatus==='confirmed'?'已通過':o.finalStatus==='rejected'?'已拒絕':'進行中'},
+  ].map(i=>`<div class="minfo-item"><label>${i.l}</label><span>${i.v}</span></div>`).join('');
+  document.getElementById('mItems').innerHTML=
+    `<div style="margin-bottom:12px"><div style="font-size:9px;font-weight:900;color:var(--muted);letter-spacing:.14em;text-transform:uppercase;font-family:Inter,sans-serif;margin-bottom:8px">器材清單</div>`+
+    o.items.map(i=>`<div class="sel-item" style="margin-bottom:5px"><span>${i.name}</span><span class="cat">${i.cat}</span></div>`).join('')+'</div>';
+  // flow
+  const fhtml=STEP_ORDER.map((s,i)=>{
+    const f=o.flow[s];
+    if(s==='finance'&&!o.needFinance)return`<span class="flow-step skip">${STEP_LABELS[s]}（略過）</span>`;
+    let cls='',icon='○';
+    if(f.status==='approved'){cls='done';icon='✓';}
+    else if(f.status==='rejected'){cls='done';icon='✕';}
+    else if(o.currentStep===s){cls='active';icon='◎';}
+    const note=f.note?` — ${f.note}`:'';
+    const by=f.by?`<br><span style="font-size:9px;color:var(--muted)">${f.by}${note}</span>`:'';
+    return`${i>0?'<span class="flow-arrow">→</span>':''}<span class="flow-step ${cls}">${icon} ${STEP_LABELS[s]}${by}</span>`;
+  }).join('');
+  document.getElementById('mFlow').innerHTML=`<div style="margin-top:10px"><div style="font-size:9px;font-weight:900;color:var(--muted);letter-spacing:.14em;text-transform:uppercase;font-family:Inter,sans-serif;margin-bottom:10px">簽核進度</div><div class="flow-row">${fhtml}</div></div>`;
+  document.getElementById('mNote').style.display='none';
+  const canAct=o.finalStatus==='pending'&&(currentUser?.role==='super'||o.currentStep===currentUser?.role);
+  const isSuper=currentUser?.role==='super';
+  document.getElementById('mActs').innerHTML=
+    `${canAct?`<button class="btn-outline" onclick="openReject('${o.id}');closeModal()">拒絕</button><button class="btn-blue" onclick="approveStep('${o.id}')">審核通過</button>`:''}
+     ${isSuper&&o.needFinance&&o.finalStatus==='pending'?`<button class="btn-outline" onclick="removeFinance('${o.id}');closeModal()">取消財務審核</button>`:''}
+     ${isSuper?`<button class="btn-outline" onclick="closeModal();openEditOrder('${o.id}')">編輯申請</button><button class="btn-sm rd" onclick="closeModal();deleteOrder('${o.id}')" style="padding:10px 14px">刪除</button>`:''}
+     ${!canAct&&!isSuper?`<button class="btn-outline" onclick="closeModal()">關閉</button>`:''}
+     <button class="btn-outline" onclick="closeModal()">關閉</button>`;
+  document.getElementById('overlay').classList.add('show');
+}
+function closeModal(e){if(!e||e.target===document.getElementById('overlay'))document.getElementById('overlay').classList.remove('show');}
+
+let tt;
+function showToast(msg,err=false){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast show'+(err?' err':'');
+  clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2600);
+}
+
+renderGrid();
+</script>
+
+<div class="loading-overlay hide" id="loadingOverlay">
+  <div class="spinner"></div>
+  <p id="loadingMsg">資料載入中...</p>
+</div>
+</body>
+</html>
