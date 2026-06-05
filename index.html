@@ -242,8 +242,9 @@ tr:hover td{background:var(--primary-lt);}
   .fg.full{grid-column:span 1;}
   .stats-bar{grid-template-columns:1fr 1fr;}
   .page-heading{font-size:24px;}
-  .filter-bar{display:flex;flex-wrap:wrap;gap:6px;}
-  .filter-bar button{padding:6px 12px;font-size:12px;}
+  .filter-bar{display:flex;flex-wrap:nowrap;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:4px;}
+  .filter-bar::-webkit-scrollbar{display:none;}
+  .filter-bar button{padding:6px 12px;font-size:12px;white-space:nowrap;flex-shrink:0;}
   .eq-grid{grid-template-columns:1fr!important;}
   .form-card{padding:18px 14px;}
   .sel-bar{flex-direction:column;gap:8px;padding:12px 14px;}
