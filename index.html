@@ -512,7 +512,7 @@ function showPage(id){
   document.getElementById('nav-apply').classList.toggle('active',id==='apply'||id==='form');
   document.getElementById('nav-query').classList.toggle('active',id==='query');
   document.getElementById('nav-admin').classList.toggle('active',id==='admin'||id==='login');
-  if(id==='apply')loadData().then(()=>renderGrid());
+  if(id==='apply')loadData(true).then(()=>renderGrid());
   if(id==='form')renderFormItems();
   if(id==='admin')renderAdmin();
   if(id==='query'){
