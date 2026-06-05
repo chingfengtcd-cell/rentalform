@@ -231,12 +231,24 @@ tr:hover td{background:var(--primary-lt);}
 .big-num{font-family:'Inter',sans-serif;font-weight:900;font-size:64px;color:var(--white);line-height:1;}
 
 @media(max-width:680px){
-  header{padding:0 16px;}
-  .page{padding:24px 16px;}
+  header{padding:0 12px;flex-wrap:wrap;height:auto;min-height:56px;gap:0;}
+  .logo{font-size:13px;padding:10px 0;}
+  .logo span{display:none;}
+  nav#mainNav{order:3;width:100%;display:flex;border-top:1px solid rgba(255,255,255,.15);margin:0 -12px;width:calc(100% + 24px);}
+  nav#mainNav button{flex:1;padding:10px 4px;font-size:11px;white-space:nowrap;border-radius:0;}
+  .user-chip{font-size:11px;padding:4px 8px;}
+  .page{padding:20px 14px;}
   .fg2{grid-template-columns:1fr;}
   .fg.full{grid-column:span 1;}
   .stats-bar{grid-template-columns:1fr 1fr;}
-  .page-heading{font-size:26px;}
+  .page-heading{font-size:24px;}
+  .filter-bar{display:flex;flex-wrap:wrap;gap:6px;}
+  .filter-bar button{padding:6px 12px;font-size:12px;}
+  .eq-grid{grid-template-columns:1fr!important;}
+  .form-card{padding:18px 14px;}
+  .sel-bar{flex-direction:column;gap:8px;padding:12px 14px;}
+  .sel-bar-btns{width:100%;display:flex;gap:8px;}
+  .sel-bar-btns button{flex:1;}
 }
 
 .loading-overlay{position:fixed;inset:0;background:rgba(13,33,55,.85);z-index:9000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
