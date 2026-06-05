@@ -459,20 +459,20 @@ async function apiPost(body){
   return r.json();
 }
 
-async function loadData(){
+async function loadData(silent=false){
   if(!API_URL){
     // 未設定 API → 用 localStorage（本機模式）
     try{const d=localStorage.getItem(SK);if(d){const p=JSON.parse(d);state.orders=p.orders||[];state.eqStatus=p.eqStatus||state.eqStatus;}}catch(e){}
     showApiBanner();
     return;
   }
-  showLoading('Sugar Sugar Rune Chocola Rune ✿');
+  if(!silent) showLoading('Sugar Sugar Rune Chocola Rune ✿');
   try{
     const [o,eq]=await Promise.all([apiGet('getOrders'),apiGet('getEq')]);
     if(o&&o.orders) state.orders=o.orders;
     if(eq&&eq.eqStatus&&eq.eqStatus.length) state.eqStatus=eq.eqStatus;
-  }catch(e){showToast('無法連線 Google Sheets，使用本機暫存',true);}
-  hideLoading();
+  }catch(e){if(!silent)showToast('無法連線 Google Sheets，使用本機暫存',true);}
+  if(!silent) hideLoading();
 }
 
 function save(){
@@ -515,7 +515,11 @@ function showPage(id){
   if(id==='apply')loadData().then(()=>renderGrid());
   if(id==='form')renderFormItems();
   if(id==='admin')renderAdmin();
-  if(id==='query'){loadData().then(()=>{document.getElementById('queryResults').innerHTML='';});}
+  if(id==='query'){
+    document.getElementById('queryResults').innerHTML='';
+    // 背景偷偷更新，不阻塞畫面
+    loadData(true);
+  }
 }
 function queryOrders(){
   const email=(document.getElementById('q-email').value.trim()+'@chingfeng.com').toLowerCase();
