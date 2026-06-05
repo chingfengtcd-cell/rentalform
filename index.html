@@ -289,7 +289,7 @@ tr:hover td{background:var(--primary-lt);}
       <div class="fg"><label>姓名 *</label><input id="f-name" type="text" placeholder="請輸入姓名"></div>
       <div class="fg"><label>部門／單位 *</label><input id="f-dept" type="text" placeholder="所屬部門"></div>
       <div class="fg"><label>聯絡電話 *</label><input id="f-phone" type="tel" placeholder="0912-345-678"></div>
-      <div class="fg"><label>電子郵件 *</label><input id="f-email" type="email" placeholder="email@example.com"></div>
+      <div class="fg"><label>電子郵件 *</label><div style="display:flex;align-items:stretch;background:var(--cream2);"><input id="f-email" type="text" placeholder="帳號" style="flex:1;border:none;outline:none;padding:0 12px;height:40px;font-size:14px;background:transparent;"><span style="padding:0 12px;display:flex;align-items:center;font-size:13px;color:var(--text);white-space:nowrap">@chingfeng.com</span></div></div>
       <div class="fg"><label>直屬主管姓名 *</label><input id="f-supervisor" type="text" placeholder="Direct Supervisor"></div>
       <div class="fg"><label>申請日期</label><input id="f-appdate" type="date"></div>
     </div>
@@ -333,7 +333,7 @@ tr:hover td{background:var(--primary-lt);}
     <div class="section-label">輸入 Email 查詢</div>
     <div class="fg" style="margin-bottom:16px">
       <label>電子郵件</label>
-      <input id="q-email" type="email" placeholder="請輸入申請時填寫的 Email" onkeydown="if(event.key==='Enter')queryOrders()">
+      <div style="display:flex;align-items:stretch;background:var(--cream2);"><input id="q-email" type="text" placeholder="帳號" style="flex:1;border:none;outline:none;padding:0 12px;height:40px;font-size:14px;background:transparent;" onkeydown="if(event.key==='Enter')queryOrders()"><span style="padding:0 12px;display:flex;align-items:center;font-size:13px;color:var(--text);white-space:nowrap">@chingfeng.com</span></div>
     </div>
     <button class="btn-blue" onclick="queryOrders()">查詢</button>
   </div>
@@ -346,19 +346,16 @@ tr:hover td{background:var(--primary-lt);}
     <div class="login-card">
       <div class="tab-label">Admin Access</div>
       <div class="login-big">後台<span>管理</span>登入</div>
-      <div class="login-sub">請選擇角色並輸入對應密碼</div>
+      <div class="login-sub">請選擇身份並輸入對應密碼</div>
       <select id="loginRole" style="width:100%">
-        <option value="">請選擇角色 —</option>
+        <option value="">請選擇身份 —</option>
         <option value="supervisor">直屬主管 Direct Supervisor</option>
-        <option value="equipment_admin">器材管理員 Equipment Admin</option>
-        <option value="approver">核准主管 Approving Manager</option>
-        <option value="finance">財務審核 Finance</option>
-        <option value="super">系統管理員 Super Admin</option>
+        <option value="super">系統管理員 Admin</option>
       </select>
       <input id="loginPw" type="password" placeholder="密碼 Password" style="width:100%" onkeydown="if(event.key==='Enter')doLogin()">
       <button class="btn-blue" onclick="doLogin()">登入 LOGIN</button>
       <div class="login-hint">
-        預設密碼：<code>supervisor</code> / <code>admin</code> / <code>approver</code> / <code>finance</code> / <code>super1234</code>
+        預設密碼：<code>supervisor</code> / <code>super1234</code>
       </div>
     </div>
   </div>
@@ -397,11 +394,8 @@ tr:hover td{background:var(--primary-lt);}
 
 <script>
 const ROLES={
-  supervisor:     {label:'直屬主管',      pw:'supervisor'},
-  equipment_admin:{label:'器材管理員',    pw:'admin'},
-  approver:       {label:'核准主管',      pw:'approver'},
-  finance:        {label:'財務審核',      pw:'finance'},
-  super:          {label:'系統管理員',    pw:'super1234'},
+  supervisor:{label:'直屬主管',pw:'supervisor'},
+  super:     {label:'系統管理員',pw:'super1234'},
 };
 const EQUIPMENT=[
   {id:1,  cat:'相機',   name:'Sony a7RIII（#1）',      spec:''},
@@ -511,7 +505,7 @@ function showPage(id){
   if(id==='query'){loadData().then(()=>{document.getElementById('queryResults').innerHTML='';});}
 }
 function queryOrders(){
-  const email=document.getElementById('q-email').value.trim().toLowerCase();
+  const email=(document.getElementById('q-email').value.trim()+'@chingfeng.com').toLowerCase();
   if(!email)return showToast('請輸入 Email',true);
   const results=state.orders.filter(o=>o.email&&o.email.toLowerCase()===email);
   const c=document.getElementById('queryResults');
@@ -545,7 +539,7 @@ function goAdmin(){currentUser?showPage('admin'):showPage('login');}
 function doLogin(){
   const role=document.getElementById('loginRole').value;
   const pw=document.getElementById('loginPw').value;
-  if(!role)return showToast('請選擇角色',true);
+  if(!role)return showToast('請選擇身份',true);
   if(pw!==ROLES[role].pw)return showToast('密碼錯誤',true);
   currentUser={role,label:ROLES[role].label};
   localStorage.setItem('studio_user',JSON.stringify(currentUser));
@@ -597,7 +591,11 @@ function renderFormItems(){
 }
 function removeItem(id){selected.delete(id);renderFormItems();if(!selected.size){showPage('apply');showToast('已清空，請重新選取');}}
 function submitForm(){
-  const v=['f-name','f-dept','f-phone','f-email','f-supervisor','f-from','f-to','f-period'].map(id=>document.getElementById(id).value.trim());
+  const v=['f-name','f-dept','f-phone','f-email','f-supervisor','f-from','f-to','f-period'].map(id=>{
+    const el=document.getElementById(id);
+    if(id==='f-email') return (el.value.trim())+'@chingfeng.com';
+    return el.value.trim();
+  });
   if(v.some(x=>!x))return showToast('請填寫所有必填欄位',true);
   if(!selected.size)return showToast('請選擇至少一項器材',true);
   const [name,dept,phone,email,supervisor,from,to,period]=v;
@@ -627,7 +625,7 @@ function submitForm(){
 }
 
 // ADMIN
-const ROLE_TABS={super:['orders','eqstatus'],supervisor:['orders'],equipment_admin:['orders','eqstatus'],approver:['orders'],finance:['orders']};
+const ROLE_TABS={super:['orders','eqstatus'],supervisor:['orders']};
 const TAB_LABELS={orders:'租借申請',eqstatus:'器材狀態'};
 function renderAdmin(){
   if(!currentUser)return;
