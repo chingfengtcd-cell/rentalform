@@ -111,14 +111,17 @@ nav button.active,nav button:hover{color:#fff;border-bottom-color:#fff;}
 .sel-bar{
   position:fixed;bottom:0;left:0;right:0;
   background:var(--primary);color:#fff;
-  padding:14px 36px;display:flex;align-items:center;justify-content:space-between;
-  transform:translateY(110%);transition:transform .3s ease;z-index:200;
+  padding:14px 36px;display:none;align-items:center;justify-content:space-between;
+  opacity:0;transition:opacity .25s ease;z-index:200;
   clip-path:polygon(0 12px,24px 0,100% 0,100% 100%,0 100%);
 }
-.sel-bar.show{transform:translateY(0);}
+.sel-bar.show{display:flex;opacity:1;}
 @media(hover:none){
   .eq-card:hover{background:var(--white);border-color:var(--cream2);transform:none;box-shadow:none;}
+  .eq-card:hover::before{background:var(--cream2);}
   .eq-card.selected:hover{background:var(--primary-lt);border-color:var(--primary);}
+  .eq-card.selected:hover::before{background:var(--primary);}
+  .eq-card{-webkit-tap-highlight-color:transparent;}
 }
 .sel-bar .info{font-size:14px;font-weight:700;} .sel-bar .info strong{font-size:20px;}
 .sel-bar-btns{display:flex;gap:10px;}
@@ -596,7 +599,14 @@ function renderGrid(){
     </div>`;
   }).join('');
   document.getElementById('selCount').textContent=selected.size;
-  document.getElementById('selBar').classList.toggle('show',selected.size>0);
+  const bar=document.getElementById('selBar');
+  if(selected.size>0){
+    bar.style.display='flex';
+    requestAnimationFrame(()=>bar.classList.add('show'));
+  } else {
+    bar.classList.remove('show');
+    bar.style.display='none';
+  }
 }
 function setFilter(c){activeFilter=c;renderGrid();}
 function tog(id){selected.has(id)?selected.delete(id):selected.add(id);renderGrid();}
